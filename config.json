@@ -1,0 +1,89 @@
+{
+  "coordinates": {
+    "beat_jump": {
+      "1": [
+        530,
+        887
+      ],
+      "2": null,
+      "4": null,
+      "8": null,
+      "16": null,
+      "32": [
+        712,
+        883
+      ],
+      "forward": [
+        850,
+        883
+      ],
+      "backward": [
+        797,
+        882
+      ],
+      "panel_left": [
+        485,
+        883
+      ],
+      "panel_right": [
+        754,
+        881
+      ]
+    },
+    "grid_edit": {
+      "edit_grid": [
+        858,
+        784
+      ],
+      "clear": [
+        793,
+        820
+      ],
+      "set": [
+        593,
+        817
+      ],
+      "save": [
+        791,
+        884
+      ]
+    },
+    "overview_waveform": {
+      "left": null,
+      "right": null,
+      "y": null
+    }
+  },
+  "audio": {
+    "sample_rate": 44100,
+    "test_duration_ms": 800,
+    "kick_band_low_hz": 40,
+    "kick_band_high_hz": 140,
+    "min_kick_score": 0.5,
+    "ambiguity_threshold": 0.1
+  },
+  "probes": {
+    "bar_sequence": [
+      17,
+      33,
+      65
+    ],
+    "jumps_per_bar": {
+      "17": 2,
+      "33": 4,
+      "65": 8
+    }
+  },
+  "timing": {
+    "post_load_delay_ms": 1200,
+    "post_click_delay_ms": 100,
+    "post_jump_delay_ms": 200
+  },
+  "safety": {
+    "max_actions_per_track": 80,
+    "max_track_seconds": 60,
+    "max_total_minutes": 10,
+    "max_focus_attempts": 3,
+    "max_jump_clicks": 20
+  }
+}
