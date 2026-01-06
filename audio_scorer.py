@@ -158,6 +158,12 @@ def capture_audio(
         # Get device parameters
         device_index = device_info["index"]
         channels = device_info["maxInputChannels"]
+        
+        # Guard against weird channel counts
+        if channels < 1:
+            raise RuntimeError(f"Device '{device_info['name']}' has no input channels")
+        channels = min(channels, 2)  # Stereo is enough, clamp to avoid issues
+        
         sample_rate = int(device_info["defaultSampleRate"])
         
         # Override sample rate if specified in config
@@ -181,14 +187,15 @@ def capture_audio(
             frames_per_buffer=chunk_size,
         )
         
-        # Capture audio
+        # Capture audio - request exact frames needed
         frames = []
         samples_captured = 0
         
         while samples_captured < frames_needed:
-            data = stream.read(chunk_size, exception_on_overflow=False)
+            to_read = min(chunk_size, frames_needed - samples_captured)
+            data = stream.read(to_read, exception_on_overflow=False)
             frames.append(data)
-            samples_captured += chunk_size
+            samples_captured += to_read
         
         stream.stop_stream()
         stream.close()
@@ -273,6 +280,10 @@ def compute_kick_score(samples: np.ndarray, cfg: AudioConfig) -> Tuple[float, di
 
     # Optional nonlinearity to reward stronger kicks
     score = float(peak_count) * (mean_peak ** cfg.score_power)
+    
+    # Require minimum peaks to avoid noise false positives
+    if peak_count < cfg.min_peaks:
+        score = 0.0
 
     debug = {
         "peak_count": peak_count,
