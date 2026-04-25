@@ -58,13 +58,11 @@ class GridFixer:
 
         self.log("[~] Done! ✓✓")
 
-        # Auto-load next track: select next in list, then load to left deck
+        # Auto-load next track using Serato's built-in shortcut (Alt+W)
         self.log("[~] Loading next track...")
-        keyboard.press('down'); time.sleep(0.05); keyboard.release('down')
-        time.sleep(0.1)
-        keyboard.press('shift'); keyboard.press('left')
+        keyboard.press('alt'); keyboard.press('w')
         time.sleep(0.05)
-        keyboard.release('left'); keyboard.release('shift')
+        keyboard.release('w'); keyboard.release('alt')
 
 
 def main():
