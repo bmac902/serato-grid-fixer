@@ -58,6 +58,16 @@ class GridFixer:
 
         self.log("[~] Done! ✓✓")
 
+        # Auto-load next track using Serato's built-in shortcut (Alt+W)
+        self.log("[~] Loading next track...")
+        keyboard.press('alt'); keyboard.press('w')
+        time.sleep(0.05)
+        keyboard.release('w'); keyboard.release('alt')
+
+        # Advance library cursor so the next ~ press loads the track after this one
+        time.sleep(0.1)
+        keyboard.send('down')
+
 
 def main():
     # Load config
@@ -83,13 +93,13 @@ def main():
         nonlocal stop_requested
         stop_requested = True
 
-    keyboard.add_hotkey('`',  on_tilde)
+    keyboard.add_hotkey('`',   on_tilde)
     keyboard.add_hotkey('F12', on_stop)
 
     print("=" * 50)
     print("SERATO GRID FIXER - Ready!")
     print("=" * 50)
-    print("~  : Set grid at current playhead position")
+    print("~   : Set grid, Hot Cue 1, load next track")
     print("F12 : Exit")
     print("=" * 50)
     print()
