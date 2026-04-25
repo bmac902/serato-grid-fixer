@@ -1,7 +1,7 @@
 """
 Serato Grid Fixer
 
-Press F8 at the exact position where you want the grid set.
+Press ~ at the exact position where you want the grid set.
 That's it.
 
 Automates: Edit Grid -> Clear -> Set -> Save -> Hot Cue 1
@@ -27,7 +27,7 @@ class GridFixer:
 
     def set_grid_here(self):
         """Click Edit Grid -> Clear -> Set -> Save -> Hot Cue 1."""
-        self.log("[F8] Setting grid at current position...")
+        self.log("[~] Setting grid at current position...")
 
         edit_grid = self.grid_coords.get("edit_grid")
         clear     = self.grid_coords.get("clear")
@@ -50,13 +50,13 @@ class GridFixer:
         pyautogui.click(save[0], save[1])
         time.sleep(0.4)
 
-        self.log("[F8] Grid set! ✓ Setting Hot Cue 1...")
+        self.log("[~] Grid set! ✓ Setting Hot Cue 1...")
 
         keyboard.press('ctrl'); keyboard.press('1')
         time.sleep(0.05)
         keyboard.release('1'); keyboard.release('ctrl')
 
-        self.log("[F8] Done! ✓✓")
+        self.log("[~] Done! ✓✓")
 
 
 def main():
@@ -76,20 +76,20 @@ def main():
 
     stop_requested = False
 
-    def on_f8():
+    def on_tilde():
         fixer.set_grid_here()
 
     def on_stop():
         nonlocal stop_requested
         stop_requested = True
 
-    keyboard.add_hotkey('F8',  on_f8)
+    keyboard.add_hotkey('`',  on_tilde)
     keyboard.add_hotkey('F12', on_stop)
 
     print("=" * 50)
     print("SERATO GRID FIXER - Ready!")
     print("=" * 50)
-    print("F8  : Set grid at current playhead position")
+    print("~  : Set grid at current playhead position")
     print("F12 : Exit")
     print("=" * 50)
     print()
