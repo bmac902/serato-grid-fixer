@@ -58,8 +58,10 @@ class GridFixer:
 
         self.log("[~] Done! ✓✓")
 
-        # Auto-load next track
+        # Auto-load next track: select next in list, then load to left deck
         self.log("[~] Loading next track...")
+        keyboard.press('down'); time.sleep(0.05); keyboard.release('down')
+        time.sleep(0.1)
         keyboard.press('shift'); keyboard.press('left')
         time.sleep(0.05)
         keyboard.release('left'); keyboard.release('shift')
