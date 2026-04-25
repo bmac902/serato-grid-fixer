@@ -116,22 +116,28 @@ class ClickGridFixer:
         if button != mouse.Button.left or not pressed:
             return
         
-        # Disarm immediately
+        # IMMEDIATELY press W to stop - do this FIRST before the track drifts!
+        # The click will move the playhead, but we need to stop it RIGHT THERE
+        keyboard.press('w')
+        keyboard.release('w')
+        
+        # Disarm click mode
         self.disarm_click_mode()
         
-        self.log(f"[CLICK MODE] Captured click at ({x}, {y})")
+        self.log(f"[CLICK MODE] Captured click at ({x}, {y}) - STOPPED!")
         
         # Process the click
         try:
+            # Wait for stop to complete
+            time.sleep(0.2)
+            
             if self.waveform_region:
                 progress = self.waveform_region.x_to_progress(x)
-                if progress < 0:
-                    self.log(f"[CLICK MODE] Click outside waveform region. Ignoring.")
-                    return
-                self.log(f"[CLICK MODE] Position: {progress:.1%} through track")
+                if progress >= 0:
+                    self.log(f"[CLICK MODE] Position: {progress:.1%} through track")
             
-            # Set grid at this position
-            self._set_grid_sequence(mode="click")
+            # Set grid at this position (already stopped)
+            self._set_grid_sequence(mode="click", already_stopped=True)
             
         except Exception as e:
             self.log(f"[CLICK MODE] Error: {e}")
@@ -145,11 +151,11 @@ class ClickGridFixer:
         Capture current playhead position and set grid there.
         User seeks/plays to the right spot, then presses F10.
         """
-        self.log("[PLAYHEAD MODE] Capturing current position...")
+        self.log("[PLAYHEAD MODE] Setting grid at current position...")
         
         try:
-            # Set grid at current position
-            self._set_grid_sequence(mode="playhead")
+            # Just click the buttons - no keyboard shortcuts
+            self._click_grid_buttons(mode="playhead")
             
         except Exception as e:
             self.log(f"[PLAYHEAD MODE] Error: {e}")
@@ -158,17 +164,87 @@ class ClickGridFixer:
     # GRID SETTING AUTOMATION
     # =========================================================================
     
-    def _set_grid_sequence(self, mode: str):
+    def _click_grid_buttons(self, mode: str):
         """
-        Execute the grid-setting sequence:
-        1. Pause playback (if playing)
-        2. Enter grid edit mode (Alt+Space)
-        3. Clear grid
-        4. Set grid at current position
-        5. Save grid
+        Click the grid edit buttons in sequence.
+        Simple version - just clicks, no keyboard shortcuts.
+        
+        1. Click Edit Grid button
+        2. Click Clear button
+        3. Click Set button
+        4. Click Save button
+        5. Set Hot Cue 1
         
         Args:
             mode: "click" or "playhead" (for logging)
+        """
+        self.log(f"[{mode.upper()}] Starting button sequence...")
+        
+        # Get button coordinates
+        edit_grid_coord = self.grid_coords.get("edit_grid")
+        clear_coord = self.grid_coords.get("clear")
+        set_coord = self.grid_coords.get("set")
+        save_coord = self.grid_coords.get("save")
+        
+        # Click Edit Grid button
+        if edit_grid_coord:
+            self.log(f"[{mode.upper()}] Clicking Edit Grid...")
+            pyautogui.click(edit_grid_coord[0], edit_grid_coord[1])
+            time.sleep(0.4)  # Wait for panel to open
+        else:
+            self.log(f"[{mode.upper()}] ERROR: Edit Grid button not calibrated!")
+            return
+        
+        # Click Clear button
+        if clear_coord:
+            self.log(f"[{mode.upper()}] Clicking Clear...")
+            pyautogui.click(clear_coord[0], clear_coord[1])
+            time.sleep(0.3)
+        else:
+            self.log(f"[{mode.upper()}] WARNING: Clear button not calibrated!")
+        
+        # Click Set button
+        if set_coord:
+            self.log(f"[{mode.upper()}] Clicking Set...")
+            pyautogui.click(set_coord[0], set_coord[1])
+            time.sleep(0.3)
+        else:
+            self.log(f"[{mode.upper()}] WARNING: Set button not calibrated!")
+        
+        # Click Save button
+        if save_coord:
+            self.log(f"[{mode.upper()}] Clicking Save...")
+            pyautogui.click(save_coord[0], save_coord[1])
+            time.sleep(0.4)
+        else:
+            self.log(f"[{mode.upper()}] WARNING: Save button not calibrated!")
+        
+        self.log(f"[{mode.upper()}] Grid set! ✓")
+        
+        # Set Hot Cue 1
+        self.log(f"[{mode.upper()}] Setting Hot Cue 1...")
+        keyboard.press('ctrl')
+        keyboard.press('1')
+        time.sleep(0.05)
+        keyboard.release('1')
+        keyboard.release('ctrl')
+        time.sleep(0.2)
+        
+        self.log(f"[{mode.upper()}] Complete! ✓✓")
+    
+    def _set_grid_sequence(self, mode: str, already_stopped: bool = False):
+        """
+        Execute the grid-setting sequence:
+        1. STOP playback completely (if not already stopped)
+        2. Enter grid edit mode (Alt+Space)
+        3. Click Clear button
+        4. Click Set button (sets grid anchor at current playhead position)
+        5. Click Save button
+        6. Set Hot Cue 1
+        
+        Args:
+            mode: "click" or "playhead" (for logging)
+            already_stopped: True if track is already stopped
         """
         self.log(f"[{mode.upper()}] Starting grid set sequence...")
         
@@ -176,42 +252,59 @@ class ClickGridFixer:
         self.controller.focus_serato()
         time.sleep(0.1)
         
-        # Pause playback
-        self.log(f"[{mode.upper()}] Pausing playback...")
-        self.controller.stop_left_deck()
-        time.sleep(0.2)
+        # STOP playback - press W key to stop (toggle off)
+        if not already_stopped:
+            self.log(f"[{mode.upper()}] Stopping playback...")
+            keyboard.press('w')
+            time.sleep(0.05)
+            keyboard.release('w')
+            time.sleep(0.3)  # Wait for stop to complete
         
         # Enter grid edit mode (Alt+Space)
         self.log(f"[{mode.upper()}] Entering grid edit mode...")
-        keyboard.send('alt+space')
-        time.sleep(0.4)
+        keyboard.press('alt')
+        keyboard.press('space')
+        time.sleep(0.05)
+        keyboard.release('space')
+        keyboard.release('alt')
+        time.sleep(0.5)  # Wait for edit panel to open
         
         # Click Clear button
         clear_coord = self.grid_coords.get("clear")
         if clear_coord:
             self.log(f"[{mode.upper()}] Clearing existing grid...")
             pyautogui.click(clear_coord[0], clear_coord[1])
-            time.sleep(0.2)
+            time.sleep(0.3)
+        else:
+            self.log(f"[{mode.upper()}] WARNING: Clear button not calibrated!")
         
         # Click Set button (sets grid anchor at current playhead position)
         set_coord = self.grid_coords.get("set")
         if set_coord:
             self.log(f"[{mode.upper()}] Setting grid anchor...")
             pyautogui.click(set_coord[0], set_coord[1])
-            time.sleep(0.2)
+            time.sleep(0.3)
+        else:
+            self.log(f"[{mode.upper()}] WARNING: Set button not calibrated!")
         
         # Click Save button (saves and exits edit mode)
         save_coord = self.grid_coords.get("save")
         if save_coord:
             self.log(f"[{mode.upper()}] Saving grid...")
             pyautogui.click(save_coord[0], save_coord[1])
-            time.sleep(0.3)
+            time.sleep(0.4)
+        else:
+            self.log(f"[{mode.upper()}] WARNING: Save button not calibrated!")
         
         self.log(f"[{mode.upper()}] Grid set! ✓")
         
         # Set Hot Cue 1 at this position
         self.log(f"[{mode.upper()}] Setting Hot Cue 1...")
-        keyboard.send('ctrl+1')
+        keyboard.press('ctrl')
+        keyboard.press('1')
+        time.sleep(0.05)
+        keyboard.release('1')
+        keyboard.release('ctrl')
         time.sleep(0.2)
         
         self.log(f"[{mode.upper()}] Complete! ✓✓")
@@ -225,14 +318,14 @@ class ClickGridFixer:
         # F9: Toggle click mode
         keyboard.add_hotkey('F9', self._toggle_click_mode)
         
-        # F10: Capture playhead position
-        keyboard.add_hotkey('F10', self.capture_playhead_position)
+        # F8: Capture playhead position
+        keyboard.add_hotkey('F8', self.capture_playhead_position)
         
         self.log("=" * 60)
         self.log("CLICK GRID FIXER - Ready!")
         self.log("=" * 60)
         self.log("F9  : CLICK MODE - Click on waveform to set grid")
-        self.log("F10 : PLAYHEAD MODE - Set grid at current position")
+        self.log("F8  : PLAYHEAD MODE - Set grid at current position")
         self.log("F12 : Emergency stop")
         self.log("=" * 60)
     
