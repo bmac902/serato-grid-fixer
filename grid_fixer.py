@@ -58,6 +58,14 @@ class GridFixer:
 
         self.log("[~] Done! ✓✓")
 
+    def load_next_track(self):
+        """Press Shift+Left Arrow to load the next track to the left deck."""
+        self.log("[SHIFT+←] Loading next track...")
+        keyboard.press('shift'); keyboard.press('left')
+        time.sleep(0.05)
+        keyboard.release('left'); keyboard.release('shift')
+        self.log("[SHIFT+←] Track loaded!")
+
 
 def main():
     # Load config
@@ -79,18 +87,23 @@ def main():
     def on_tilde():
         fixer.set_grid_here()
 
+    def on_next_track():
+        fixer.load_next_track()
+
     def on_stop():
         nonlocal stop_requested
         stop_requested = True
 
-    keyboard.add_hotkey('`',  on_tilde)
-    keyboard.add_hotkey('F12', on_stop)
+    keyboard.add_hotkey('`',          on_tilde)
+    keyboard.add_hotkey('shift+left', on_next_track)
+    keyboard.add_hotkey('F12',        on_stop)
 
     print("=" * 50)
     print("SERATO GRID FIXER - Ready!")
     print("=" * 50)
-    print("~  : Set grid at current playhead position")
-    print("F12 : Exit")
+    print("~          : Set grid at current playhead position")
+    print("Shift+← : Load next track to left deck")
+    print("F12        : Exit")
     print("=" * 50)
     print()
 
