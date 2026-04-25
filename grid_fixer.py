@@ -64,6 +64,10 @@ class GridFixer:
         time.sleep(0.05)
         keyboard.release('w'); keyboard.release('alt')
 
+        # Advance library cursor so the next ~ press loads the track after this one
+        time.sleep(0.1)
+        keyboard.send('down')
+
 
 def main():
     # Load config
