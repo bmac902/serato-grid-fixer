@@ -1,14 +1,11 @@
-# Serato Grid Auto-Fixer — Dependencies
-# Phase 1: Navigation Proof-of-Concept
+# Serato Click Grid Fixer — Dependencies
 
 # UI Automation
 pyautogui>=0.9.54
 pygetwindow>=0.0.9
 
-# Global hotkey detection
+# Hotkey detection
 keyboard>=0.13.5
 
-# Phase 2+ (uncomment when needed)
-# sounddevice>=0.4.6    # WASAPI audio capture
-# numpy>=1.24.0         # Audio processing
-# scipy>=1.10.0         # Signal processing (bandpass filter)
+# Mouse event detection
+pynput>=1.7.6
