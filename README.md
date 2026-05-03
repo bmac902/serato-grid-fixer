@@ -27,6 +27,8 @@ That's the entire app. One key, one shot.
 
 ![Demo: launching grid_fixer.py, calibrating, then ripping through tracks](docs/demo.gif)
 
+Still image: [Screenshot](docs/Screenshot%202026-05-03%20123407.png)
+
 ## Quick start
 
 ```powershell
