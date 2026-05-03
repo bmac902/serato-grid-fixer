@@ -1,11 +1,10 @@
-# Serato Click Grid Fixer — Dependencies
+# Serato Grid Fixer — Dependencies
 
-# UI Automation
+# UI automation (mouse clicks)
 pyautogui>=0.9.54
-pygetwindow>=0.0.9
 
-# Hotkey detection
+# Global hotkey detection (the ~ key)
 keyboard>=0.13.5
 
-# Mouse event detection
+# Mouse click capture (used by calibrate_buttons.py)
 pynput>=1.7.6
