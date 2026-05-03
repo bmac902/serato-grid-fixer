@@ -68,7 +68,7 @@ def main():
         print(f"  {k:<12}: {v}")
     print("=" * 55)
     print()
-    print("Now run: python click_grid_fixer.py")
+    print("Now run: python grid_fixer.py")
 
 if __name__ == "__main__":
     main()

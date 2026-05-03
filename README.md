@@ -1,108 +1,100 @@
-# Serato Click Grid Fixer
+# Serato Grid Fixer
 
-**Stop wasting hours manually fixing beatgrids.** This tool automates the tedious button-clicking sequence when you already know where the first kick is.
+A tiny Windows hotkey utility for [Serato DJ Pro](https://serato.com/dj/pro) that automates the tedious button-clicking sequence when you're fixing a misaligned beatgrid.
 
-## The Problem
+## The problem
 
-SoundCloud tracks often load with misaligned beatgrids in Serato. The manual workflow is:
-1. Find the first kick (by ear/eye)
-2. Seek to that position
-3. Edit Grid → Clear → Set → Save → Set Hot Cue 1
-4. Repeat for 50+ tracks 😫
+SoundCloud and other streaming tracks often load with misaligned beatgrids in Serato — sometimes off by a beat, sometimes off by a full bar, sometimes just plain wrong. The manual workflow is mind-numbing:
 
-## The Solution
+1. Find the first kick (by ear or eye)
+2. Seek/play to that position
+3. Edit Grid → Clear → Set → Save
+4. Set Hot Cue 1
+5. Load the next track
+6. Repeat for 50+ tracks 😫
 
-You handle the hard part (finding the kick), the tool handles the tedious part (the button sequence).
+You handle the hard part — finding the kick. This tool handles the click-soup.
 
-### Two Modes
+> **Problem solved:** ripped through 250+ tracks before I finished a beer.
 
-**F9 - Click Mode**: Click on the waveform where you see the kick
-- Fast for visually obvious kicks
-- No need to play first
+## What it does
 
-**F10 - Playhead Mode**: Seek/play to the exact spot, then press F10
-- Precise when you need to hear it
-- You control the exact position
+Press <kbd>~</kbd> (the backtick/tilde key) at the position where you want the grid set, and the tool runs:
 
-Both modes automatically execute: **Pause → Edit Grid → Clear → Set → Save → Set Hot Cue 1**
+**Edit Grid → Clear → Set → Save → Hot Cue 1 → load next track**
 
-## Quick Start
+That's the entire app. One key, one shot.
+
+![Demo: launching grid_fixer.py, calibrating, then ripping through tracks](docs/demo.gif)
+
+## Quick start
 
 ```powershell
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Make sure your config.json has grid_edit coordinates calibrated
-#    (it should already have them from the old project)
+# 2. Calibrate the four grid-edit button positions in your Serato layout
+python calibrate_buttons.py
 
-# 3. Optional: Calibrate waveform region for click mode
-python click_grid_fixer.py --calibrate
-
-# 4. Run it
-python click_grid_fixer.py
+# 3. Run it
+python grid_fixer.py
 ```
+
+Or just double-click `launch_grid_fixer.cmd` (and `launch_calibrator.cmd` for recalibration).
 
 ## Usage
 
-1. **Load a track** in Serato (left deck)
+1. Open Serato DJ Pro and load a track on the **left deck**.
+2. Run `grid_fixer.py`.
+3. Seek or play to the exact point where you want the grid anchored (typically the first kick).
+4. Press <kbd>~</kbd>. The tool clicks Edit Grid → Clear → Set → Save, sets Hot Cue 1, then loads the next track in your library.
+5. Repeat for the next track.
+6. Press <kbd>F12</kbd> to exit.
 
-2. **Choose your mode:**
+**Mouse failsafe:** slam your mouse into the top-left corner of the screen to abort whatever pyautogui is doing.
 
-   **Click Mode (F9):**
-   - Press `F9`
-   - Click where you want the grid set
-   
-   **Playhead Mode (F10):**
-   - Seek/play to the exact position
-   - Press `F10`
+### Workflow tip: sort by track number, descending
 
-3. **Watch it work!** The tool will:
-   - Pause playback
-   - Clear the old grid
-   - Set grid at your position
-   - Save
-   - Set Hot Cue 1
+Sort your library/crate by track number in descending order before you start. New tracks land at the top, so as the tool auto-advances with each <kbd>~</kbd> press you're always working on tracks that haven't been gridded yet. Otherwise you'll start clobbering tracks you've already set up.
 
-4. **Repeat** for the next track
+## Calibration
 
-5. **Press F12** to exit
+`config.json` stores the on-screen pixel coordinates of four buttons in the Serato Beatgrid Edit panel:
 
-## Configuration
-
-`config.json` contains calibrated button positions. The grid_edit section should have:
 ```json
 "grid_edit": {
   "edit_grid": [x, y],
-  "clear": [x, y],
-  "set": [x, y],
-  "save": [x, y]
+  "clear":     [x, y],
+  "set":       [x, y],
+  "save":      [x, y]
 }
 ```
 
-If these aren't set, you'll need to calibrate them (see the old calibrate.py or manually measure).
+Run `python calibrate_buttons.py` (or double-click `launch_calibrator.cmd`) and click each button when prompted. Coordinates are saved to `config.json` immediately after each click, so you can ctrl-C out partway through without losing what you've already done.
 
-## Benefits
+You'll need to recalibrate any time the Serato layout changes — for example, if you resize/move the window, switch monitors or DPI scaling, or **plug in (or unplug) a DJ controller**, since Serato shifts the layout to add deck/mixer panels when a controller is connected. Calibrate against the layout you actually use day-to-day (most likely: controller plugged in).
 
-- **Saves hours** — reduces 30-second manual workflow to 1-2 seconds
-- **No audio analysis** — uses your expert ears instead of fragile algorithms
-- **Reliable** — you're in control, tool just automates the clicks
-- **Fast workflow** — press F10 as you go, don't break your rhythm
+## How it works (briefly)
 
-## Tips
+- `keyboard` listens for the global <kbd>~</kbd> hotkey.
+- `pyautogui` clicks the four button coordinates from `config.json` in sequence.
+- A few `keyboard.send` calls fire <kbd>Ctrl+1</kbd> (Hot Cue 1) and <kbd>Alt+W</kbd> (Serato's "load next track" shortcut), then <kbd>↓</kbd> to advance the library cursor so the *next* press works on the right track.
 
-- **Use Playhead Mode (F10) while playing** — set grid on-the-fly as track plays
-- **Use Click Mode (F9) for visual kicks** — fast for obvious waveforms
-- **Batch process** — load track, F10, next track, F10, next track...
-- **Mouse failsafe** — move mouse to top-left corner to emergency stop
+The hot cue is set at the exact same position as the grid anchor — useful as a "go back to where I started this track" reference if you don't beat-jump back to bar 1.
 
-## Technical
+## Requirements
 
-- Python 3.8+
-- Uses `pyautogui` for UI automation
-- Uses `keyboard` for global hotkeys
-- Uses `pynput` for mouse click detection
-- Uses `pygetwindow` for window focus
+- Windows (the `keyboard` library needs admin-style hooks; macOS isn't supported here)
+- Python 3.10+
+- Serato DJ Pro
+- A standard left-deck layout (the Hot Cue 1 hotkey assumes left deck)
+
+## Limitations
+
+- **Left deck only.** Hot Cue 1 binds to <kbd>Ctrl+1</kbd> on the left deck; the right deck would need <kbd>Ctrl+6</kbd>.
+- **Layout-dependent.** Calibrated coordinates break if you resize the Serato window or move the Beatgrid Edit panel. Recalibrate when that happens.
+- **No undo.** If the wrong grid gets set, fix it in Serato manually.
 
 ## License
 
-Do whatever you want with it. If it saves you hours of tedious work, that's payment enough.
+MIT — see [LICENSE](LICENSE).
