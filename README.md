@@ -57,6 +57,12 @@ Or just double-click `launch_grid_fixer.cmd` (and `launch_calibrator.cmd` for re
 
 Sort your library/crate by track number in descending order before you start. New tracks land at the top, so as the tool auto-advances with each <kbd>~</kbd> press you're always working on tracks that haven't been gridded yet. Otherwise you'll start clobbering tracks you've already set up.
 
+### Workflow tip: use it like a beatgrid conveyor belt
+
+Most tracks are already basically correct. For those, you can still press <kbd>~</kbd> at the right spot and let the tool run anyway. The beatgrid stays correct, but you still get the useful side effects: Hot Cue 1 gets dropped at the anchor point, the next track loads, and the library cursor advances.
+
+That turns the whole process into a beatgrid conveyor belt: listen, confirm, tap <kbd>~</kbd>, move on.
+
 ## Calibration
 
 `config.json` stores the on-screen pixel coordinates of four buttons in the Serato Beatgrid Edit panel:
