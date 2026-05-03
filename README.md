@@ -15,7 +15,7 @@ SoundCloud and other streaming tracks often load with misaligned beatgrids in Se
 
 You handle the hard part — finding the kick. This tool handles the click-soup.
 
-> **Problem solved:** ripped through 250+ tracks before I finished a beer.
+> **Problem solved:** ripped through 250+ tracks before I finished a beer 🍺
 
 ## What it does
 
