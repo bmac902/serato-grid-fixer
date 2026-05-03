@@ -1,22 +1,10 @@
 {
   "coordinates": {
     "grid_edit": {
-      "edit_grid": [
-        364,
-        788
-      ],
-      "clear": [
-        1021,
-        812
-      ],
-      "set": [
-        960,
-        808
-      ],
-      "save": [
-        1004,
-        877
-      ]
+      "edit_grid": null,
+      "clear": null,
+      "set": null,
+      "save": null
     }
   }
 }
